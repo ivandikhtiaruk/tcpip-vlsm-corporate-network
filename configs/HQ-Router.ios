@@ -1,1 +1,62 @@
 
+! ==============================================================================
+! Конфігурація центрального маршрутизатора HQ-Router м. Київ
+! ==============================================================================
+hostname HQ-Router
+
+interface GigabitEthernet0/0
+ no shutdown
+
+interface GigabitEthernet0/0.10
+ description *** SERVER FARM ***
+ encapsulation dot1Q 10
+ ip address 172.16.0.193 255.255.255.192
+
+interface GigabitEthernet0/0.20
+ description *** IT & DEVELOPMENT ***
+ encapsulation dot1Q 20
+ ip address 172.16.0.1 255.255.255.128
+
+interface GigabitEthernet0/0.30
+ description *** ADMINISTRATION ***
+ encapsulation dot1Q 30
+ ip address 172.16.0.129 255.255.255.192
+
+interface Serial0/0/0
+ description *** WAN LINK TO LVIV ***
+ ip address 172.16.255.1 255.255.255.252
+ clock rate 2000000
+ no shutdown
+
+interface Serial0/0/1
+ description *** WAN LINK TO ODESA ***
+ ip address 172.16.255.5 255.255.255.252
+ clock rate 2000000
+ no shutdown
+
+interface Serial0/1/0
+ description *** WAN LINK TO KHARKIV ***
+ ip address 172.16.255.9 255.255.255.252
+ clock rate 2000000
+ no shutdown
+
+router ospf 1
+ router-id 1.1.1.1
+ network 172.16.0.0 0.0.0.255 area 0
+ network 172.16.255.0 0.0.0.3 area 0
+ network 172.16.255.4 0.0.0.3 area 0
+ network 172.16.255.8 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0.10
+ passive-interface GigabitEthernet0/0.20
+ passive-interface GigabitEthernet0/0.30
+
+interface GigabitEthernet0/1
+ description *** INTERNET OUTSIDE ***
+ ip address 198.51.100.2 255.255.255.252
+ ip nat outside
+ no shutdown
+
+access-list 1 permit 172.16.0.0 0.0.255.255
+ip nat inside source list 1 interface GigabitEthernet0/1 overload
+end
+write memory
