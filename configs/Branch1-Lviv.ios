@@ -1,1 +1,30 @@
+! ==============================================================================
+! Конфігурація маршрутизатора філії Branch-1 м. Львів
+! ==============================================================================
+hostname Branch1-Router
 
+interface GigabitEthernet0/0
+ description *** LOCAL LAN LVIV ***
+ ip address 172.16.2.1 255.255.255.192
+ no shutdown
+
+interface Serial0/0/0
+ description *** WAN TO HQ KYIV ***
+ ip address 172.16.255.2 255.255.255.252
+ no shutdown
+
+ip dhcp excluded-address 172.16.2.1 172.16.2.10
+
+ip dhcp pool LVIV-LAN
+ network 172.16.2.0 255.255.255.192
+ default-router 172.16.2.1
+ dns-server 172.16.0.194
+ domain-name corporate.local
+
+router ospf 1
+ router-id 2.2.2.2
+ network 172.16.2.0 0.0.0.63 area 0
+ network 172.16.255.0 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0
+end
+write memory
